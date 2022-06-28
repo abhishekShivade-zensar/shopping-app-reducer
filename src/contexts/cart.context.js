@@ -1,4 +1,5 @@
 import { createContext, useReducer } from "react";
+import {createAction} from '../utils/reducer/reducer.utils'
 
 const addCartItem = (cartItems, productToAdd) => {
     //find if cartItems already contains a productToAdd
@@ -63,6 +64,13 @@ const cartReducer = (state, action) => {
                 ...payload
             }
 
+        case CART_ACTION_TYPES.SET_IS_CART_OPEN:
+            return{
+                ...state,
+                isCartOpen:payload
+            }
+
+
         default:
             throw new Error(`unhandled type of cart${type} in cartReducer`)
     }
@@ -72,8 +80,8 @@ export const CartProvider = ({ children }) => {
 
     const [state,dispatch]=useReducer(cartReducer,INITIAL_STATE)
     const {cartItems,isCartOpen,cartCount,cartTotal}=state
+    
     const updateCartItemReducer = (newCartItems) => {
-
         const newCartCount = newCartItems.reduce((total, cartItem) => total + cartItem.quantity, 0)
 
         const newCartTotal= newCartItems.reduce((total, cartItem) => total + cartItem.quantity * cartItem.price, 0)
@@ -88,11 +96,11 @@ export const CartProvider = ({ children }) => {
             newCartCount
         } */
 
-        dispatch({type:CART_ACTION_TYPES.SET_CART_ITEMS,payload:{
+        dispatch(createAction(CART_ACTION_TYPES.SET_CART_ITEMS,{
             cartItems:newCartItems,
             cartTotal:newCartTotal,
             cartCount:newCartCount
-        }})
+        }))
     }
 
     const addItemToCart = (productToAdd) => {
@@ -111,12 +119,12 @@ export const CartProvider = ({ children }) => {
     }
 
     const setIsCartOpen=(flag)=>{
-        dispatch({type:CART_ACTION_TYPES.SET_IS_CART_OPEN})
+        dispatch(createAction(CART_ACTION_TYPES.SET_IS_CART_OPEN,flag))
     }
 
     const value = {
         isCartOpen,
-        setIsCartOpen:()=>{},
+        setIsCartOpen: setIsCartOpen,
         addItemToCart,
         cartItems,
         cartCount,
